@@ -16,7 +16,7 @@ followed by a sandbox PayPal quote for a future remediation service.
 ## What it does
 
 PayProof reads a supplier CSV and deterministically flags duplicate identifiers
-and invalid prices, returning row-level findings. It can ask a local CPU-only
+and invalid prices, returning row-level findings and downloadable JSON evidence. It can ask a local CPU-only
 Ollama model to explain the verified errors without supplying raw CSV rows
 to the model. PayPal sandbox Orders v2 creates a $19 demonstration checkout,
 and a separate read-only PayPal API call checks the sandbox order status.
@@ -26,7 +26,7 @@ Sandbox orders are never misrepresented as live payments.
 
 Python standard-library browser server, CSV parser, Decimal validation,
 local Ollama CPU-only model, PayPal sandbox OAuth and Orders v2 API,
-vanilla browser HTML/CSS/JS, and unittest. Entire source is MIT-licensed
+responsive vanilla HTML/CSS/JS with a visual audit workbench, and unittest. Entire source is MIT-licensed
 and separate from proprietary ATLAS production code.
 
 ## Key technical achievements

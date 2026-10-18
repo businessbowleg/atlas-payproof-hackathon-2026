@@ -68,6 +68,18 @@ This project can be published on GitHub. Its release does not confer any
 permission to publish or modify proprietary ATLAS production source.
 
 
+
+
+## Interface preview
+
+![PayProof integrity engine dashboard](docs/interface-preview.png)
+
+The updated responsive workbench provides visible pass/hold metrics,
+deterministic row-by-row corrections, human-readable explanations, and
+a downloadable JSON report. Its PayPal order-status check remains read-only.
+The homepage's labeled sample preview is illustrative; measured results
+only appear after running the local integrity check.
+
 ## Recording and Devpost submission
 
 [Demo recording guide](DEMO_RECORDING_GUIDE.md) gives the actual browser
