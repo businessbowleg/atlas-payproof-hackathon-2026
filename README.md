@@ -76,3 +76,16 @@ contains prepared text for the competition entry. Public YouTube video and
 the final Devpost entry are still required. Buyer approval and capture have
 been skipped at the owner's direction; the documented demo demonstrates
 actual sandbox order creation and read-only status instead.
+
+
+## Real hackathon video
+
+A **79-second MP4 recording** of the actual running PayProof browser app
+with offline narration is available in the
+[PayProof demo release](https://github.com/businessbowleg/atlas-payproof-hackathon-2026/releases/tag/payproof-demo-v1).
+The recording demonstrates real CSV validation, a real local CPU-only model
+response, PayPal sandbox order creation and read-only status checking.
+It explicitly shows **CREATED, not PAID**. There is no transaction capture.
+
+**Important:** GitHub-hosted video is NOT the required public YouTube video.
+A public YouTube upload and Devpost submission remain outstanding.

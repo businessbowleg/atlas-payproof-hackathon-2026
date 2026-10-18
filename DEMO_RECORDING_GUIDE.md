@@ -1,6 +1,12 @@
 # PayProof — Actual hackathon demonstration recording plan
 
-This document is a filming script, NOT a recorded video. Use real PayProof footage.
+A **real 79-second browser recording has now been produced**.
+It can be downloaded from:
+https://github.com/businessbowleg/atlas-payproof-hackathon-2026/releases/download/payproof-demo-v1/ATLAS_PayProof_Hackathon_Demo.mp4
+
+This document remains the recording plan for reshoots, and the video still
+must be uploaded to PUBLIC YouTube to satisfy the Devpost requirement.
+The recorded footage comes from a real headless Chrome session on NODE001.
 DO NOT simulate PayPal approval, AI model output, customer data, or prize status.
 
 Official deadline: November 12, 2026, 12:00 p.m. Pacific / 3:00 p.m. Eastern.
