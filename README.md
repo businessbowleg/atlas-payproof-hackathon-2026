@@ -2,7 +2,7 @@
 
 **Status: isolated prototype, NOT a production payment or AI service.**
 
-PayProof validates supplier CSV data and demonstrates a checkout workflow using the PayPal Orders v2 **sandbox only**. Created as a small, independently licensed hackathon candidate by Bowleg Systems. This repository is **not** ATLAS's proprietary internal code.
+PayProof validates supplier CSV data and demonstrates order creation plus a read-only status check using the PayPal Orders v2 **sandbox only**. Created as a small, independently licensed hackathon candidate by Bowleg Systems. This repository is **not** ATLAS's proprietary internal code.
 
 ## Why it exists
 
@@ -40,7 +40,8 @@ The sandbox approval is a test transaction. The capture endpoint verifies the or
 * POST /inspect — JSON with csv text, returns ticket, diagnostics and quote
 * POST /insights — optional local AI report explanation; 503 when disabled
 * POST /checkout — JSON with ticket, returns demo or sandbox order
-* POST /capture — JSON with ticket and order_id; verifies PayPal sandbox capture (API-only)
+* POST /order-status — JSON with ticket; retrieves the current PayPal sandbox order state WITHOUT a capture
+* POST /capture — JSON with ticket and order_id; OPTIONAL untested buyer-approval/capture route, not needed for the published demo
 
 Do **not** deploy this preview on a public interface. Before production, add authentication, persistent idempotent payment records, strict server-side amounts, CSRF protection, rate limits, event/webhook verification, no sensitive-data logs, a real privacy policy, and independent security verification.
 
@@ -65,3 +66,13 @@ demo video and PayPal sandbox credentials are not included in source code.
 
 This project can be published on GitHub. Its release does not confer any
 permission to publish or modify proprietary ATLAS production source.
+
+
+## Recording and Devpost submission
+
+[Demo recording guide](DEMO_RECORDING_GUIDE.md) gives the actual browser
+actions and a truthful narration script. [Submission draft](SUBMISSION_DRAFT.md)
+contains prepared text for the competition entry. Public YouTube video and
+the final Devpost entry are still required. Buyer approval and capture have
+been skipped at the owner's direction; the documented demo demonstrates
+actual sandbox order creation and read-only status instead.

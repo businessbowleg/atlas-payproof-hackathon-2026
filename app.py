@@ -57,6 +57,26 @@ def create_checkout(ticket):
         item["state"] = "ORDER_CREATED"
     return order
 
+def get_checkout_status(ticket):
+    """Read a previously created order, never capture a payment."""
+    with lock:
+        item = sessions.get(ticket)
+        if not item or item["state"] not in ("ORDER_CREATED", "SANDBOX_CAPTURED"):
+            raise DataError("Unknown or ineligible ticket.")
+        order_id = item["order_id"]
+    if not SANDBOX:
+        return {"order_id": order_id, "status": "SIMULATED",
+                "sandbox": False, "real_funds": False,
+                "note": "Demo-only checkout. No PayPal request was sent."}
+    result = SandboxPayPal().get_order(order_id)
+    unit = result.get("purchase_units", [{}])[0]
+    amount = unit.get("amount") or {}
+    if amount.get("currency_code") != "USD" or amount.get("value") != PRICE:
+        raise PaymentError("Sandbox order amount verification failed.")
+    return {"order_id": order_id, "status": result.get("status", "UNKNOWN"),
+            "sandbox": True, "real_funds": False,
+            "note": "PayPal SANDBOX state only. This action does not capture a payment."}
+
 def capture_checkout(ticket, order_id):
     with lock:
         item = sessions.get(ticket)
@@ -119,6 +139,8 @@ class Handler(BaseHTTPRequestHandler):
                 result = explain_ticket(body["ticket"])
             elif path == "/checkout":
                 result = create_checkout(body["ticket"])
+            elif path == "/order-status":
+                result = get_checkout_status(body["ticket"])
             elif path == "/capture":
                 result = capture_checkout(body["ticket"], body["order_id"])
             else:

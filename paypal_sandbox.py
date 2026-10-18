@@ -63,6 +63,26 @@ class SandboxPayPal:
             raise PaymentError("Sandbox approval URL verification failed.")
         return {"id": data["id"], "approve_url": url, "status": data.get("status")}
 
+    def get_order(self, order_id):
+        """Read only: retrieve PayPal SANDBOX order state, without a capture."""
+        if not re.fullmatch(r"[A-Za-z0-9]{8,40}", order_id):
+            raise PaymentError("Invalid order ID.")
+        req = urllib.request.Request(
+            BASE + "/v2/checkout/orders/" + order_id,
+            headers={"Authorization": "Bearer " + self._token(),
+                     "Accept": "application/json"},
+            method="GET")
+        try:
+            with urllib.request.urlopen(req, timeout=12) as res:
+                details = json.loads(res.read())
+        except urllib.error.HTTPError as exc:
+            raise PaymentError("PayPal sandbox returned HTTP " + str(exc.code)) from exc
+        except (OSError, ValueError) as exc:
+            raise PaymentError("PayPal sandbox unavailable.") from exc
+        if details.get("id") != order_id:
+            raise PaymentError("Sandbox order identity mismatch.")
+        return details
+
     def capture_order(self, order_id, request_id):
         if not re.fullmatch(r"[A-Za-z0-9]{8,40}", order_id):
             raise PaymentError("Invalid order ID.")

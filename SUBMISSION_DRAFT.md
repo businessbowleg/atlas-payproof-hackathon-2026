@@ -1,71 +1,85 @@
-# PayPal AI Hackathon — Draft entry (NOT submitted)
+# PayPal AI Hackathon — Submission Copy (NOT SUBMITTED)
 
-Event: https://paypalaihackathon.devpost.com/
-Official deadline: November 12, 2026, 12:00 PM Pacific Standard Time (3:00 PM Eastern).
-Entry fee: $0.
+Entry: PayProof — AI Supplier Integrity with PayPal Sandbox Checkout
+Tagline: Catch broken supplier catalogs before they become broken customer orders.
+Repository: https://github.com/businessbowleg/atlas-payproof-hackathon-2026
+Hackathon: https://paypalaihackathon.devpost.com/
+Deadline: November 12, 2026, 12:00 p.m. Pacific / 3:00 p.m. Eastern.
 
-## Project name
-PayProof — AI-guided supplier integrity and sandbox purchase approval
+## Inspiration
 
-## Elevator pitch
-Small online sellers routinely receive supplier product feeds with duplicate SKUs,
-invalid prices, and other import blockers. PayProof evaluates catalog readiness
-locally, explains problems with an optionally enabled local AI model, and
-demonstrates a human-approved PayPal sandbox payment for a detailed remediation
-workflow. Deterministic checks—not AI guesses—decide which records are held.
-It keeps customer data local and never mistakes sandbox currency for real revenue.
+Small sellers receive supplier CSV catalogs with duplicate SKUs, invalid pricing,
+and inconsistent identifiers. These problems become broken listings and costly
+manual corrections. PayProof offers local validation and AI explanations,
+followed by a sandbox PayPal quote for a future remediation service.
 
-## Motivation
-Merchant onboarding workflows are tedious, expensive, and easy to get wrong.
-Unchecked supplier data can lead to broken listings, customer confusion,
-and unnecessary manual cleanup.
+## What it does
 
-## Demonstrated capabilities as of initial prototype
-- Local browser-based CSV inspection of fictional data
-- Duplicate and invalid price detection; row-specific exceptions
-- Optional local-only Ollama explanation behind explicit enable flag
-- PayPal Orders v2 create/capture *sandbox* code path, with mocked tests
-- Fail-closed sandbox capture verification and demo-mode payment disclaimers
-- Automated unit tests and local HTTP smoke test
-- Source code independently licensed under MIT; no proprietary ATLAS files
+PayProof reads a supplier CSV and deterministically flags duplicate identifiers
+and invalid prices, returning row-level findings. It can ask a local CPU-only
+Ollama model to explain the verified errors without supplying raw CSV rows
+to the model. PayPal sandbox Orders v2 creates a $19 demonstration checkout,
+and a separate read-only PayPal API call checks the sandbox order status.
+Sandbox orders are never misrepresented as live payments.
 
-## Not yet demonstrated — MUST finish before claiming a completed entry
-- Actual PayPal developer sandbox order creation, buyer approval, capture
-- Actual local-model inference test with appropriate spare compute
-- Robust AI-guided actionable remediation beyond a basic explanation
-- Video under three minutes, PUBLIC on YouTube, showing real app operation
-- Working public repository and public submission with approved representative
-- Any claim that a paid service, production checkout, public user accounts,
-  automatic repair delivery, or actual payments exists
+## How we built it
 
-## Demo-video outline (target 2:15)
-00:00–00:15 — The problem: an illustrative supplier CSV fails import
-00:15–00:40 — Local CSV upload/inspection; duplicate and invalid price identified
-00:40–01:00 — Optional local AI describes only verified exceptions
-01:00–01:35 — PayPal SANDBOX order creation, explicit customer approval, capture
-01:35–01:50 — Show sandbox result and that zero real money changed hands
-01:50–02:05 — Independent tests and reproducible source instructions
-02:05–02:15 — Clear limitations, target audience, future product
+Python standard-library browser server, CSV parser, Decimal validation,
+local Ollama CPU-only model, PayPal sandbox OAuth and Orders v2 API,
+vanilla browser HTML/CSS/JS, and unittest. Entire source is MIT-licensed
+and separate from proprietary ATLAS production code.
 
-Only record the sandbox segment after it works end-to-end.
-Do not fabricate footage, customer endorsements, prizes, or financial results.
+## Key technical achievements
 
-## Prize relevance
-Possible: Grand prizes, Best Use of PayPal + AI, Best Use of Agentic Commerce.
-These are judged awards with uncertain probability. This project has no
-special-sponsor integration currently; do not claim eligibility for sponsor prizes.
+- Real PayPal sandbox OAuth verified on October 18, 2026.
+- Real sandbox order creation verified with PayPal for 19.00 USD.
+- Actual local CPU-only model inference verified (roughly 43 seconds).
+- Deterministic CSV error detection with row-level problem reporting.
+- Public GitHub repo containing runnable source, test suite and setup guide.
+- No paid hosting, no production financial transactions, no real customer data.
 
-## Explicit owner-controlled actions remaining
-1. Verify repository URL and app access (connected account currently lists no repos).
-2. Join the hackathon under the owner's identity or authorized business representative.
-3. Provision FREE PayPal developer sandbox credentials safely (never paste in chat).
-4. Verify live sandbox order creation/approval/capture and optionally local AI.
-5. Record and publish a real demo video, then submit on Devpost before deadline.
+## Challenges
 
-Official criteria: technology, design, impact, novelty, presentation
-https://paypalaihackathon.devpost.com/rules
+Getting trustworthy data-integrity assessments matters more than plausible AI
+text: rules determine whether rows pass, while local AI merely explains.
+The payment workflow makes a strong distinction between a CREATED sandbox
+order and a real paid transaction. All demo traffic is local/sandbox.
 
-## Security and ownership
-This prototype is not connected to ATLAS production, real Shopify orders,
-live PayPal merchant accounts, or customer data. Never add any real credentials
-or private business files to this public project.
+## What we learned
+
+AI agents handling commerce need explicit evidence, provenance, and financial
+truth. A generated checkout is not collected revenue. AI explanations need
+deterministic grounding and limited data exposure.
+
+## Next steps
+
+Add human-approved CSV repair suggestions, signed payment webhooks,
+merchant-facing authentication, and controlled catalog import pipelines.
+These are proposed enhancements, not current capabilities.
+
+## How judges can run it
+
+Install Python 3.10 or newer.
+Run: python3 -m unittest discover -s tests -v
+Run: python3 app.py
+Open: http://127.0.0.1:9087
+
+For a genuine PayPal sandbox order, privately set PAYPAL_SANDBOX_CLIENT_ID and
+PAYPAL_SANDBOX_SECRET from your own free sandbox developer app.
+For local AI, install Ollama, pull an appropriate small model, and set
+PAYPROOF_LOCAL_MODEL. The app also runs in explicitly labeled demo mode with
+no credentials. Never publish sandbox secrets in GitHub.
+
+## Submission state
+
+GitHub source: PUBLISHED
+Registered for hackathon: CONFIRMED BY OWNER
+PayPal sandbox OAuth and order creation: VERIFIED
+Buyer approval/capture: SKIPPED (do not claim completed)
+Local model inference: VERIFIED
+Public YouTube walkthrough URL: NOT YET AVAILABLE
+Devpost final submission: NOT SUBMITTED
+Prize money: NONE
+
+Judging criteria: Technology, design, impact, innovation, presentation.
+Official rules: https://paypalaihackathon.devpost.com/rules

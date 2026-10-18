@@ -28,7 +28,7 @@ DEMO-103,-4.00,Invalid price</textarea>
 <section class="panel"><h2>3 / Checkout demonstration</h2>
 <p>The $19.00 quote represents a proposed paid audit workflow. No real payments can occur in this app.</p>
 <button id="checkout" disabled>Create sandbox checkout</button>
-<p id="payment" aria-live="polite" class="muted">Not started.</p><button id="capture" disabled>Verify approved sandbox payment</button></section>
+<p id="payment" aria-live="polite" class="muted">Not started.</p><button id="status" disabled>Check sandbox order status (no purchase)</button></section>
 <script>
 let ticket=null;let orderId=null;
 async function post(path, data) {
@@ -43,7 +43,7 @@ document.getElementById("inspect").onclick=async()=>{
   document.getElementById("result").textContent=v.summary+"\n\n"+JSON.stringify(v.report,null,2);
   document.getElementById("checkout").disabled=false;
   document.getElementById("insights").disabled=false;
-  document.getElementById("capture").disabled=true;
+  document.getElementById("status").disabled=true;
   document.getElementById("payment").textContent="Awaiting checkout.";
  }catch(e){ticket=null;document.getElementById("checkout").disabled=true;document.getElementById("insights").disabled=true;document.getElementById("result").textContent=e.message}
 };
@@ -51,7 +51,7 @@ document.getElementById("checkout").onclick=async()=>{
  try{
   const v=await post("/checkout",{ticket});
   orderId=v.id;
-  document.getElementById("capture").disabled=!v.approve_url;
+  document.getElementById("status").disabled=false;
   const el=document.getElementById("payment");
   el.textContent="Order "+v.id+" — "+v.status+". ";
   if(v.approve_url){const a=document.createElement("a");a.href=v.approve_url;a.rel="noopener noreferrer";a.target="_blank";a.textContent="Approve in PayPal sandbox";el.appendChild(a)}
@@ -63,9 +63,10 @@ document.getElementById("insights").onclick=async()=>{
   document.getElementById("ai-result").textContent=v.guidance+" — "+v.disclaimer;
  }catch(e){document.getElementById("ai-result").textContent=e.message}
 };
-document.getElementById("capture").onclick=async()=>{
- try{const v=await post("/capture",{ticket,order_id:orderId});
-  document.getElementById("payment").textContent=v.status+" — "+v.notice;
+document.getElementById("status").onclick=async()=>{
+ try{const v=await post("/order-status",{ticket});
+  document.getElementById("payment").textContent=
+    "Sandbox order "+v.order_id+" — "+v.status+". "+v.note;
  }catch(e){document.getElementById("payment").textContent=e.message}
 };
 </script></body></html>
