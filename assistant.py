@@ -26,7 +26,9 @@ def explain(report):
     req = urllib.request.Request(
         "http://127.0.0.1:11434/api/generate",
         data=json.dumps({"model": model, "prompt": prompt, "stream": False,
-                         "options": {"temperature": 0, "num_predict": 170}}).encode(),
+                         "keep_alive": "0s",
+                         "options": {"temperature": 0, "num_predict": 170,
+                                     "num_gpu": 0, "num_thread": 2}}).encode(),
         headers={"Content-Type": "application/json"}, method="POST")
     try:
         with urllib.request.urlopen(req, timeout=45) as result:

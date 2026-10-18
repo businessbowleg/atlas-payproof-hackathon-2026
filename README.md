@@ -21,7 +21,7 @@ The app binds to loopback and stores session state in process memory only. The C
 
 ## Optional local AI (owner-controlled, off by default)
 
-Set PAYPROOF_LOCAL_MODEL to an Ollama model already approved for use on your own machine. Then POST /insights with a ticket or use the button in the preview. The prompt receives only aggregate validation counts and issue categories, **not** uploaded CSV text. It calls loopback Ollama only. Verify the available model lane and resource budget before enabling; never preempt ATLAS production GPUs for a hackathon.
+Set PAYPROOF_LOCAL_MODEL to an Ollama model already approved for use on your own machine. Then POST /insights with a ticket or use the button in the preview. The prompt receives only aggregate validation counts and issue categories, **not** uploaded CSV text. It calls loopback Ollama only. Inference is explicitly constrained to CPU (num_gpu=0, 2 threads, immediate unload); this avoids using production GPU VRAM but still consumes some host CPU/RAM. Verify the available model lane and resource budget before enabling; never preempt ATLAS production GPUs for a hackathon.
 
 ## Payment modes
 

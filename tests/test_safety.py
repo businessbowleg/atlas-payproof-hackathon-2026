@@ -21,6 +21,9 @@ class LocalAI(unittest.TestCase):
             data = json.loads(req.data)
             self.assertNotIn("HIDDEN-PRIVATE-DATA", data["prompt"])
             self.assertEqual(data["options"]["temperature"], 0)
+            self.assertEqual(data["options"]["num_gpu"], 0)
+            self.assertEqual(data["options"]["num_thread"], 2)
+            self.assertEqual(data["keep_alive"], "0s")
             return Response()
         report = inspect_csv("SKU,Price\nHIDDEN-PRIVATE-DATA,1")
         with patch.dict(os.environ, {"PAYPROOF_LOCAL_MODEL": "test-small-model"}):
