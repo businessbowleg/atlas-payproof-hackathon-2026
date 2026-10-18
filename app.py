@@ -10,8 +10,12 @@ from urllib.parse import urlsplit
 from core import DataError, PRICE, inspect_csv, summary
 from assistant import AIUnavailable, enabled as ai_enabled, explain as ai_explain
 from paypal_sandbox import PaymentError, SandboxPayPal, valid_capture
+from remediation import plan_repairs, apply_reviewed_repairs
 
 ROOT = Path(__file__).resolve().parent
+PORT = int(os.getenv("PAYPROOF_PORT", "9087"))
+if PORT not in (9087, 9091):
+    raise RuntimeError("PayProof only supports the approved local preview ports.")
 SANDBOX = os.getenv("PAYPAL_SANDBOX_CLIENT_ID") and os.getenv("PAYPAL_SANDBOX_SECRET")
 # Intentionally process-local state. Restart drops sessions and orders.
 sessions = {}
@@ -124,7 +128,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            if self.headers.get("Origin") not in (None, "http://127.0.0.1:9087", "http://localhost:9087"):
+            if self.headers.get("Origin") not in (None, f"http://127.0.0.1:{PORT}", f"http://localhost:{PORT}"):
                 raise DataError("Cross-site requests are not allowed.")
             if self.headers.get("Content-Type", "").split(";")[0].strip() != "application/json":
                 raise DataError("Expected application/json.")
@@ -135,6 +139,12 @@ class Handler(BaseHTTPRequestHandler):
             path = urlsplit(self.path).path
             if path == "/inspect":
                 result = begin_report(body["csv"])
+            elif path == "/remediation-plan":
+                result = plan_repairs(body["csv"])
+            elif path == "/remediation-preview":
+                result = apply_reviewed_repairs(
+                    body["csv"], body["source_sha256"],
+                    body["edits"], body.get("approved") is True)
             elif path == "/insights":
                 result = explain_ticket(body["ticket"])
             elif path == "/checkout":
@@ -154,5 +164,5 @@ class Handler(BaseHTTPRequestHandler):
             self.respond({"error": str(exc)[:160]}, 502)
 
 if __name__ == "__main__":
-    print("ATLAS PayProof isolated preview on http://127.0.0.1:9087 — " + mode(), flush=True)
-    ThreadingHTTPServer(("127.0.0.1", 9087), Handler).serve_forever()
+    print(f"ATLAS PayProof isolated preview on http://127.0.0.1:{PORT} — " + mode(), flush=True)
+    ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()

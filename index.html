@@ -149,6 +149,22 @@ DEMO-103,-4.00,Invalid price</textarea>
     </div>
   </div>
 </section>
+<section id="remediation" class="card pad" style="margin:24px 0">
+ <div class="step">R3 CANDIDATE / HUMAN-REVIEWED REMEDIATION</div>
+ <h3>Turn findings into an exportable correction plan.</h3>
+ <p class="note">Review every proposed SKU or price correction. PayProof never silently changes a value, infers a price, imports products, or claims to verify supplier legitimacy.</p>
+ <div class="toolrow"><button id="repair-plan" class="secondary" disabled>Build correction plan →</button><span class="pill">LOCAL · HUMAN APPROVAL</span></div>
+ <div id="repair-fields" class="issue-list" aria-live="polite"></div>
+ <label style="display:flex;align-items:center;gap:9px;margin:15px 0;font-size:12px;color:#dbe9fb">
+  <input type="checkbox" id="repair-consent" style="accent-color:#6ce0d7">
+  I reviewed and approve these explicit corrections.
+ </label>
+ <div class="toolrow">
+  <button id="repair-preview" class="secondary" disabled>Verify corrected catalog</button>
+  <button id="repair-download" class="primary" disabled>Download reviewed CSV ↓</button>
+ </div>
+ <div id="repair-feedback" aria-live="polite" class="note">Inspect a CSV to prepare a reviewed correction plan.</div>
+</section>
 <section class="extra-grid">
   <div id="intelligence" class="card pad">
     <div class="step">02 / EXPLAINABLE INTELLIGENCE</div><h3>Clarity without exposing the catalog.</h3>
@@ -172,7 +188,7 @@ DEMO-103,-4.00,Invalid price</textarea>
 <footer><span>PayProof / A BOWLEG SYSTEMS EXPERIMENT</span><span>OPEN SOURCE · FICTIONAL DATA · NO REAL MONEY</span></footer>
 </div>
 <script>
-let ticket=null,orderId=null,lastReport=null;
+let ticket=null,orderId=null,lastReport=null,repairPlan=null,repairCandidate=null;
 const $=id=>document.getElementById(id);
 async function post(path,data){
   const response=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
@@ -216,9 +232,78 @@ $("inspect").onclick=async()=>{
     const ok=document.createElement("div");ok.className="issue-ok";ok.textContent="No failures in these basic checks. Additional supplier verification is still necessary.";list.append(ok);
   }
   $("insights").disabled=false;$("checkout").disabled=false;$("download").disabled=false;
+  $("repair-plan").disabled=false;$("repair-preview").disabled=true;$("repair-download").disabled=true;
+  $("repair-consent").checked=false;repairPlan=null;repairCandidate=null;
+  $("repair-fields").replaceChildren();$("repair-feedback").textContent="Build a correction plan to review held rows.";
   $("status").disabled=true;$("ai-result").textContent="";$("payment").textContent="No sandbox order created in this session.";
  }catch(error){ticket=null;$("audit-label").textContent="INPUT ERROR";$("result").textContent=error.message;}
  finally{$("inspect").disabled=false;}
+};
+$("repair-plan").onclick=async()=>{
+ const c=$("repair-fields");c.replaceChildren();
+ repairCandidate=null;$("repair-download").disabled=true;
+ $("repair-consent").checked=false;
+ try{
+  repairPlan=await post("/remediation-plan",{csv:$("csv").value});
+  if(repairPlan.issues_truncated)throw Error("Too many issues. Use a smaller CSV.");
+  if(!repairPlan.issues.length){
+    $("repair-feedback").textContent="No held rows to correct. This is not a compliance guarantee.";
+    $("repair-preview").disabled=true;return;
+  }
+  for(const issue of repairPlan.issues){
+    const line=document.createElement("div");line.className="issue-item repair-row";
+    line.dataset.row=issue.row;
+    const head=document.createElement("div");head.className="issue-row";head.textContent="ROW "+issue.row;
+    const sku=document.createElement("div");sku.className="issue-code";sku.textContent=issue.sku||"—";
+    const form=document.createElement("div");
+    const why=document.createElement("div");why.className="issue-reason";why.textContent=issue.reasons.join(" • ");
+    form.append(why);
+    function addInput(key,placeholder){
+      const input=document.createElement("input");
+      input.type="text";input.className="repair-"+key;
+      input.placeholder=placeholder;input.setAttribute("aria-label","Row "+issue.row+" corrected "+key);
+      input.autocomplete="off";
+      input.style.cssText="padding:10px;margin:7px 7px 0 0;max-width:205px;background:#0a1427;color:#fff;border:1px solid #5d7899;border-radius:6px;";
+      form.append(input);
+    }
+    if(issue.reasons.some(x=>x.includes("SKU")))addInput("sku","Enter unique SKU");
+    if(issue.reasons.some(x=>x.includes("price")))addInput("price","Enter valid price in USD");
+    line.append(head,sku,form);c.append(line);
+  }
+  $("repair-preview").disabled=false;
+  $("repair-feedback").textContent="Proposed edits require human input, explicit consent, and a successful full recheck.";
+ }catch(error){repairPlan=null;$("repair-preview").disabled=true;$("repair-feedback").textContent=error.message;}
+};
+$("repair-preview").onclick=async()=>{
+ repairCandidate=null;$("repair-download").disabled=true;
+ if(!$("repair-consent").checked){$("repair-feedback").textContent="Check the explicit review-and-approval box first.";return;}
+ if(!repairPlan){$("repair-feedback").textContent="Build the correction plan first.";return;}
+ const edits=[];
+ for(const node of document.querySelectorAll(".repair-row")){
+  const patch={row:Number(node.dataset.row)};
+  for(const field of ["sku","price"]){
+    const input=node.querySelector(".repair-"+field);
+    if(input&&input.value.trim())patch[field]=input.value.trim();
+  }
+  if(Object.keys(patch).length>1)edits.push(patch);
+ }
+ try{
+  const result=await post("/remediation-preview",{
+    csv:$("csv").value,source_sha256:repairPlan.source_sha256,
+    edits,approved:true
+  });
+  $("repair-feedback").textContent=result.ready
+    ?"All basic integrity holds resolved. Review/download the candidate; this is not a supplier certification."
+    :result.remaining_count+" rows still held. Correct the remaining issues and verify again. No export permitted.";
+  if(result.ready){repairCandidate=result.candidate_csv;$("repair-download").disabled=false;}
+ }catch(error){$("repair-feedback").textContent="Correction plan rejected: "+error.message;}
+};
+$("repair-download").onclick=()=>{
+ if(!repairCandidate)return;
+ const blob=new Blob([repairCandidate],{type:"text/csv;charset=utf-8"});
+ const a=document.createElement("a");const url=URL.createObjectURL(blob);
+ a.href=url;a.download="payproof-human-reviewed-candidate.csv";a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),200);
 };
 $("download").onclick=()=>{
  if(!lastReport)return;

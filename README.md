@@ -101,3 +101,10 @@ It explicitly shows **CREATED, not PAID**. There is no transaction capture.
 
 **Important:** GitHub-hosted video is NOT the required public YouTube video.
 A public YouTube upload and Devpost submission remain outstanding.
+
+
+## Candidate R3 (review branch only)
+
+A separate reviewed-remediation branch adds local, human-approved CSV correction
+with SHA-256 provenance and safe-export gating. See [R3_REVIEW.md](R3_REVIEW.md).
+This is **not** in the approved R2 public main-branch baseline.
