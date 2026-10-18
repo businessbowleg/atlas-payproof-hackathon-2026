@@ -31,7 +31,7 @@ def explain(report):
                                      "num_gpu": 0, "num_thread": 2}}).encode(),
         headers={"Content-Type": "application/json"}, method="POST")
     try:
-        with urllib.request.urlopen(req, timeout=45) as result:
+        with urllib.request.urlopen(req, timeout=90) as result:
             body = json.loads(result.read(65536))
     except (OSError, ValueError) as exc:
         raise AIUnavailable("Local model did not produce a response.") from exc
