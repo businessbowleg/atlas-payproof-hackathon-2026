@@ -1,8 +1,8 @@
 # PayProof — Actual hackathon demonstration recording plan
 
-A **real 79-second browser recording has now been produced**.
+A revised **real 2-minute 11-second 1080p browser recording (R2)** has now been produced.
 It can be downloaded from:
-https://github.com/businessbowleg/atlas-payproof-hackathon-2026/releases/download/payproof-demo-v1/ATLAS_PayProof_Hackathon_Demo.mp4
+https://github.com/businessbowleg/atlas-payproof-hackathon-2026/releases/download/payproof-demo-v2/ATLAS_PayProof_Hackathon_Demo_R2.mp4
 
 This document remains the recording plan for reshoots, and the video still
 must be uploaded to PUBLIC YouTube to satisfy the Devpost requirement.

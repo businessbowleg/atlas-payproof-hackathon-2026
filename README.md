@@ -92,10 +92,10 @@ actual sandbox order creation and read-only status instead.
 
 ## Real hackathon video
 
-A **79-second MP4 recording** of the actual running PayProof browser app
+A redesigned **2-minute 11-second 1080p recording (R2)** of the actual running PayProof browser app
 with offline narration is available in the
-[PayProof demo release](https://github.com/businessbowleg/atlas-payproof-hackathon-2026/releases/tag/payproof-demo-v1).
-The recording demonstrates real CSV validation, a real local CPU-only model
+[PayProof R2 demo release](https://github.com/businessbowleg/atlas-payproof-hackathon-2026/releases/tag/payproof-demo-v2).
+The R2 recording adds a redesigned visual workbench and natural narration. It demonstrates real CSV validation, a real local CPU-only model
 response, PayPal sandbox order creation and read-only status checking.
 It explicitly shows **CREATED, not PAID**. There is no transaction capture.
 

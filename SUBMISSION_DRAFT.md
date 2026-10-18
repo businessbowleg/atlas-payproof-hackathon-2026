@@ -73,8 +73,8 @@ no credentials. Never publish sandbox secrets in GitHub.
 ## Submission state
 
 GitHub source: PUBLISHED
-Video captured (79 seconds) and published as GitHub release: VERIFIED
-Public GitHub demo MP4: https://github.com/businessbowleg/atlas-payproof-hackathon-2026/releases/download/payproof-demo-v1/ATLAS_PayProof_Hackathon_Demo.mp4
+Video R2 captured (2:11, 1080p, narrated) and published as GitHub release: VERIFIED
+Public GitHub demo MP4: https://github.com/businessbowleg/atlas-payproof-hackathon-2026/releases/download/payproof-demo-v2/ATLAS_PayProof_Hackathon_Demo_R2.mp4
 Registered for hackathon: CONFIRMED BY OWNER
 PayPal sandbox OAuth and order creation: VERIFIED
 Buyer approval/capture: SKIPPED (do not claim completed)
