@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PayProof | Supplier Integrity</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,Segoe UI,sans-serif;background:#0d1320;color:#e6ebf6}
+body{max-width:790px;margin:auto;padding:34px 20px}
+h1{font-size:2.1rem;letter-spacing:-.04em}h2{font-size:1.15rem}
+p,.muted{color:#adbbd4;line-height:1.55}button{background:#6aa5ee;border:0;border-radius:9px;color:#06172a;padding:12px 20px;font-weight:700;cursor:pointer}
+button:focus-visible,textarea:focus-visible{outline:3px solid #b7d1f9}
+textarea{box-sizing:border-box;width:100%;min-height:170px;padding:13px;border:1px solid #4b627a;border-radius:10px;background:#141d2b;color:#f5f8ff;font-family:monospace}
+.panel{background:#172236;border:1px solid #34445b;border-radius:16px;padding:18px;margin:19px 0}
+.chip{border:1px solid #7c97b8;display:inline-block;padding:6px 10px;border-radius:20px;color:#d7e6ff;font-size:.8rem}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}
+a{color:#9dd0ff}
+</style></head><body>
+<div class="chip" id="mode">DEMO — no real payments</div>
+<h1>PayProof</h1><p>Supplier CSV integrity checks with a PayPal sandbox checkout flow. Fictional data only during evaluation.</p>
+<section class="panel"><h2>1 / Inspect a supplier catalog</h2>
+<label for="csv">CSV rows (SKU, Price)</label>
+<textarea id="csv" spellcheck="false">SKU,Price,Name
+DEMO-101,12.50,Gasket
+DEMO-101,12.50,Duplicate gasket
+DEMO-103,-4.00,Invalid price</textarea>
+<p><button id="inspect">Inspect without charge</button></p></section>
+<section class="panel"><h2>2 / Review findings</h2>
+<pre id="result">Nothing inspected yet.</pre><button id="insights" disabled>Explain findings with local AI</button><p id="ai-result" aria-live="polite" class="muted"></p></section>
+<section class="panel"><h2>3 / Checkout demonstration</h2>
+<p>The $19.00 quote represents a proposed paid audit workflow. No real payments can occur in this app.</p>
+<button id="checkout" disabled>Create sandbox checkout</button>
+<p id="payment" aria-live="polite" class="muted">Not started.</p><button id="capture" disabled>Verify approved sandbox payment</button></section>
+<script>
+let ticket=null;let orderId=null;
+async function post(path, data) {
+  const r=await fetch(path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+  const v=await r.json();if(!r.ok) throw Error(v.error||"Request failed");return v;
+}
+fetch("/health").then(r=>r.json()).then(v=>{document.getElementById("mode").textContent=v.mode==="PAYPAL_SANDBOX"?"PAYPAL SANDBOX — no real funds":"DEMO — no real payments"}).catch(()=>{});
+document.getElementById("inspect").onclick=async()=>{
+ try{
+  const v=await post("/inspect",{csv:document.getElementById("csv").value});
+  ticket=v.ticket;
+  document.getElementById("result").textContent=v.summary+"\n\n"+JSON.stringify(v.report,null,2);
+  document.getElementById("checkout").disabled=false;
+  document.getElementById("insights").disabled=false;
+  document.getElementById("capture").disabled=true;
+  document.getElementById("payment").textContent="Awaiting checkout.";
+ }catch(e){ticket=null;document.getElementById("checkout").disabled=true;document.getElementById("insights").disabled=true;document.getElementById("result").textContent=e.message}
+};
+document.getElementById("checkout").onclick=async()=>{
+ try{
+  const v=await post("/checkout",{ticket});
+  orderId=v.id;
+  document.getElementById("capture").disabled=!v.approve_url;
+  const el=document.getElementById("payment");
+  el.textContent="Order "+v.id+" — "+v.status+". ";
+  if(v.approve_url){const a=document.createElement("a");a.href=v.approve_url;a.rel="noopener noreferrer";a.target="_blank";a.textContent="Approve in PayPal sandbox";el.appendChild(a)}
+  else el.textContent+="No payment made. Simulated demonstration.";
+ }catch(e){document.getElementById("payment").textContent=e.message}
+};
+document.getElementById("insights").onclick=async()=>{
+ try{const v=await post("/insights",{ticket});
+  document.getElementById("ai-result").textContent=v.guidance+" — "+v.disclaimer;
+ }catch(e){document.getElementById("ai-result").textContent=e.message}
+};
+document.getElementById("capture").onclick=async()=>{
+ try{const v=await post("/capture",{ticket,order_id:orderId});
+  document.getElementById("payment").textContent=v.status+" — "+v.notice;
+ }catch(e){document.getElementById("payment").textContent=e.message}
+};
+</script></body></html>

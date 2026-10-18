@@ -1,0 +1,13 @@
+stages: [test, audit]
+test:
+  image: python:3.12-alpine
+  stage: test
+  script:
+    - python -m unittest discover -s tests -v
+audit:
+  image: python:3.12-alpine
+  stage: audit
+  script:
+    - python -m compileall -q core.py app.py paypal_sandbox.py assistant.py
+    - 'if grep -R -nE "(sk_live_|BEGIN PRIVATE KEY|PAYPAL_SANDBOX_SECRET=.{10})" --include="*.py" .; then exit 1; fi'
+  allow_failure: false
